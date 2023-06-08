@@ -33,10 +33,19 @@ const Main = () => {
 
  
   // SALVANDO DADOS NO LOCALSTORAGE
+
   useEffect(() => {
-    localStorage.setItem('repos', JSON.stringify(repositorios));
+    if(repositorios.length > 0){
+      localStorage.setItem('repos', JSON.stringify(repositorios));
+    }
   }, [repositorios]);
+
+  // useEffect(() => {
+  //   localStorage.setItem('repos', JSON.stringify(repositorios));
+  // }, [repositorios]);
  
+console.log(repositorios);
+console.log(newRepo);
 
   // FAZENDO A REQUISIÇÃO DOS REPOSITÓRIOS
   const handleSubmit = useCallback((event) => {

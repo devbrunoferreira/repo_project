@@ -117,6 +117,31 @@ export const PageActions = styled.div`
         border-radius: 4px;
         border: none;
         outline: 0;
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
     }
 
+`;
+
+export const FilterList = styled.div`
+    margin: 15px 0;
+
+    button {
+        /* background-color: #222; */
+        outline: 0;
+        border: 0;
+        padding: 8px;
+        border-radius: 4px;
+        margin: 0 3px;
+
+        &:nth-child(${props => props.active + 1}){
+            background: #0071db;
+            color: #FFF;
+        }
+
+    }
 `;
