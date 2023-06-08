@@ -1,17 +1,3 @@
-// CÓDIGO DO CURSO
-
-// const Repositorio = ({match}) => {
-
-//   return (
-//     <h1 style={{color:'#FFF'}}>
-//       Repositorio
-//       {match.params.repositorio}
-//     </h1>
-//   );
-// };
-
-// export default Repositorio;
-
 
 // CÓDIGO ATUALIZADO E FUNCIONANDO
 
@@ -25,7 +11,7 @@ import api from '../../services/api';
 import { useParams } from 'react-router-dom';
 
 // STYLED-COMPONENTS
-import { Loading, Container, Owner, BackButton, IssuesList, PageActions } from './styles';
+import { Loading, Container, Owner, BackButton, IssuesList, PageActions, FilterList } from './styles';
 
 // ICONS
 import { FaArrowLeft } from 'react-icons/fa';
@@ -39,6 +25,12 @@ const Repositorio = () => {
   const [issues, setIssues] = useState([]); // Usamos um ARRAY vazio porque vamos listar vários itens
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [filters, setFilters] = useState([
+    {state: 'all', label: 'All', active: true},
+    {state: 'open', label: 'Open', active: false},
+    {state: 'closed', label: 'Closed', active: false}
+  ]);
+  const [filterIndex, setFilterIndex] = useState(0);
 
   useEffect(() => {
     async function load() {
@@ -50,7 +42,7 @@ const Repositorio = () => {
         api.get(`/repos/${nomeRepo}`),
         api.get(`/repos/${nomeRepo}/issues`, {
           params: {
-            state: 'open',
+            state: filters.find(f => f.active).state,
             per_page: 5
           }
         })
@@ -74,9 +66,9 @@ const Repositorio = () => {
     async function loadIssue() {
       const nomeRepo = repositorio;
 
-      const response = await api.get(`/repo/${nomeRepo}/issues`, {
+      const response = await api.get(`/repos/${nomeRepo}/issues`, {
         params: {
-          state: 'open',
+          state: filters[filterIndex].state,
           page,
           per_page: 5,
         },
@@ -87,11 +79,15 @@ const Repositorio = () => {
     }
 
     loadIssue();
-  }, [repositorio, page]);
+  }, [filters, filterIndex, repositorio, page]);
 
   const handlePage = (action) => {
     setPage(action === 'back' ? page -1 : page +1);
   };
+
+  function handleFilter(index) {
+    setFilterIndex(index);
+  }
 
   console.log(page);
 
@@ -119,6 +115,18 @@ const Repositorio = () => {
         <p>{repo.description}</p>
       </Owner>
 
+      <FilterList active={filterIndex}>
+        {filters.map((filter, index) => (
+          <button
+            type='button'
+            key={filter.label}
+            onClick={() => handleFilter(index)}
+          >
+            {filter.label}
+          </button>
+        ))}
+      </FilterList>
+
       <IssuesList>
         {issues.map( issue => (
           <li key={String(issue.id)}>
@@ -141,12 +149,16 @@ const Repositorio = () => {
       </IssuesList>
 
       <PageActions>
-        <button type='button' onClick={() => handlePage('back')}>
-          Voltar
+        <button 
+        type='button' 
+        onClick={() => handlePage('back')}
+        disabled={page < 2}
+        >
+          Back
         </button>
 
         <button type='button' onClick={() => handlePage('next')}>
-          Próxima
+          Next
         </button>
       </PageActions>
 
